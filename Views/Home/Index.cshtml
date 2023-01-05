@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ParserExcel.Models.ExcelFile>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h3>Выберите файл для загрузки</h3>
+<form asp-action="AddFile" asp-controller="Home" method="post" enctype="multipart/form-data">
+    <input type="file" name="uploadedFile" /><br>
+    <input type="submit" value="Загрузить" />
+</form>
+
+<h2>Список загруженных файлов</h2>
+<table class="table">
+    <tr><th>Id</th><th>Название файла</th><th>Название банка</th><th>Дата создания документа</th><th>Дата добавления документа</th></tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Id</td>
+            <td>@item.FileName</td>
+            <td>@item.BankName</td>
+            <td>@item.FileDate</td>
+            <td>@item.FileDateGenerate</td>
+            <td>
+                <form asp-controller="Home" asp-action="Review" asp-route-id="@item.Id">
+                    <input type="submit" value="Просмотр"/>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

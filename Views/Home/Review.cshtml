@@ -1,0 +1,132 @@
+﻿@model IEnumerable<ParserExcel.Models.ExcelFileInfo>
+@{
+    void RenderBalanceAccountSum(IEnumerable<ParserExcel.Models.ExcelFileInfo> Model, ExcelFileInfo item)
+    {
+        <tr class="fw-bold">
+            <td>@(Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100)</td>
+            <td>@Model.Where(i => i.BalanceAccount/100==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100).Sum(it=>it.OpBalanceAsset)</td>
+            <td>@Model.Where(i => i.BalanceAccount/100==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100).Sum(it=>it.OpBalanceLiability)</td>
+            <td>@Model.Where(i => i.BalanceAccount/100==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100).Sum(it=>it.TurnoverAsset)</td>
+            <td>@Model.Where(i => i.BalanceAccount/100==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100).Sum(it=>it.TurnoverLiability)</td>
+            <td>@Model.Where(i => i.BalanceAccount/100==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100).Sum(it=>it.ClBalanceAsset)</td>
+            <td>@Model.Where(i => i.BalanceAccount/100==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100).Sum(it=>it.ClBalanceLiability)</td>
+        </tr>
+    }
+    void RenderClassSum(IEnumerable<ParserExcel.Models.ExcelFileInfo> Model, ExcelFileInfo item)
+    {
+        <tr class="fw-bold">
+            <td>ПО КЛАССУ:</td>
+            <td>@Model.Where(i => i.BalanceAccount/1000==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 1000).Sum(it=>it.OpBalanceAsset)</td>
+            <td>@Model.Where(i => i.BalanceAccount/1000==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 1000).Sum(it=>it.OpBalanceLiability)</td>
+            <td>@Model.Where(i => i.BalanceAccount/1000==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 1000).Sum(it=>it.TurnoverAsset)</td>
+            <td>@Model.Where(i => i.BalanceAccount/1000==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 1000).Sum(it=>it.TurnoverLiability)</td>
+            <td>@Model.Where(i => i.BalanceAccount/1000==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 1000).Sum(it=>it.ClBalanceAsset)</td>
+            <td>@Model.Where(i => i.BalanceAccount/1000==Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 1000).Sum(it=>it.ClBalanceLiability)</td>
+        </tr>
+    }
+    void RenderBalance(IEnumerable<ParserExcel.Models.ExcelFileInfo> Model)
+    {
+        <tr class="fw-bold">
+            <td>Баланс :</td>
+            <td>@Model.Sum(i => i.OpBalanceAsset)</td>
+            <td>@Model.Sum(i => i.OpBalanceLiability)</td>
+            <td>@Model.Sum(i => i.TurnoverAsset)</td>
+            <td>@Model.Sum(i => i.TurnoverLiability)</td>
+            <td>@Model.Sum(i => i.ClBalanceAsset)</td>
+            <td>@Model.Sum(i => i.ClBalanceLiability)</td>
+        </tr>
+    }
+    void RenderItem(ExcelFileInfo item)
+    {
+        <tr>
+            <td>@item.BalanceAccount</td>
+            <td>@item.OpBalanceAsset</td>
+            <td>@item.OpBalanceLiability</td>
+            <td>@item.TurnoverAsset</td>
+            <td>@item.TurnoverLiability</td>
+            <td>@item.ClBalanceAsset</td>
+            <td>@item.ClBalanceLiability</td>
+        </tr>
+    }
+}
+
+<h2 class="align-content-center">Оборотная ведомость</h2>
+<table class="table table-bordered table-sm">
+    <tr><th rowcolspan="2">Бс/ч</th><th colspan="2" class="text-center">Входящее Сальдо</th><th colspan="2" class="text-center">Обороты</th><th colspan="2" class="text-center">Исходящее сальдо</th></tr>
+    <tr><th></th><th>Актив</th><th>Пассив</th><th>Дебет</th><th>Кредит</th><th>Актив</th><th>Пассив</th></tr>
+    @foreach(var item in Model)
+    {
+        // распределение на классы
+        if (item.Id == Model.First().Id)
+        {
+            <tr><td colspan="7" align="center" class="fw-bold">КЛАСС 1 Денежные средства, драгоценные металлы и межбанковские операции</td></tr>
+        }
+
+        if(item.Id>=Model.Skip(1).First().Id) 
+        {
+            if ((item.BalanceAccount / 100) != (Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount / 100))
+            {
+                RenderBalanceAccountSum(Model, item);
+            }
+
+            if((item.BalanceAccount/1000) != (Model.Where(i => i.Id == item.Id - 1).First().BalanceAccount/1000))
+            {
+                RenderClassSum(Model, item);           
+
+                switch(item.BalanceAccount/1000)
+                {
+                    case 2:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold">КЛАСС 2 Кредитные и иные активные операции с клиентами</td>
+                        </tr>
+                        break;
+                    case 3:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold">КЛАСС 3 Счета по операциям клиентов</td>
+                        </tr>
+                        break;
+                    case 4:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold">КЛАСС 4 Ценные бумаги</td>
+                        </tr>
+                        break;
+                    case 5:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold"> КЛАСС 5 Долгосрочные финансовые вложения в уставные фонды юридических лиц, основные средства и прочее имущество</td>
+                        </tr>
+                        break;
+                    case 6:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold">КЛАСС 6 Прочие активы и прочие пассивы</td>
+                        </tr>
+                        
+                        break;
+                    case 7:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold">КЛАСС 7 Собственный капитал банка</td>
+                        </tr>
+                        break;
+                    case 8:
+                        <tr>
+                             <td colspan="7" align="center" class="fw-bold">КЛАСС 8 Доходы банка</td>
+                        </tr>  
+                        break;
+                    case 9:
+                        <tr>
+                            <td colspan="7" align="center" class="fw-bold">КЛАСС 9 Расходы банка</td>
+                        </tr>
+                        break;
+                    default:
+                        break;
+                }    
+            }           
+        }
+
+        RenderItem(item);
+
+        if(item.Id==Model.Last().Id)
+        {
+            RenderBalance(Model);
+        }
+    }
+</table>
